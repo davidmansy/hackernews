@@ -1,14 +1,14 @@
 import React from 'react';
 
-const Search = ({ query, onSearchChange, children }) => {
+const Search = ({ query, onChange, children, onSubmit }) => {
   return (
-    <form>
-      {children}
+    <form onSubmit={onSubmit}>
       <input
         type="text"
         value={query}
-        onChange={e => onSearchChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
       />
+      <button type="submit">{children}</button>
     </form>
   );
 };

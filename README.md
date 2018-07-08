@@ -1,4 +1,4 @@
-# MyReads Project
+# Hackernews Project
 
 This is a react Hackernews clone.
 
