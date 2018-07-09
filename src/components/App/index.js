@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-import Search from './components/Search';
-import Table from './components/Table';
-import Button from './components/Button';
-import './App.css';
-
-const DEFAULT_QUERY = 'redux';
-const DEFAULT_HPP = 100;
-
-const PATH_BASE = 'https://hn.algolia.com/api/v1';
-const PATH_SEARCH = '/search';
-const PARAM_SEARCH = 'query=';
-const PARAM_PAGE = 'page=';
-const PARAM_HPP = 'hitsPerPage=';
+import Search from '../Search';
+import Table from '../Table';
+import Button from '../Button';
+import './index.css';
+import {
+  DEFAULT_QUERY,
+  DEFAULT_HPP,
+  PATH_BASE,
+  PATH_SEARCH,
+  PARAM_SEARCH,
+  PARAM_PAGE,
+  PARAM_HPP
+} from '../../constants';
+import fetch from 'isomorphic-fetch';
 
 class App extends Component {
   constructor(props) {
@@ -25,17 +26,19 @@ class App extends Component {
   }
 
   setSearchTopStories(result) {
-    const { hits, page } = result;
-    const { searchKey, results } = this.state;
-    const oldHits =
-      results && results[searchKey] ? results[searchKey].hits : [];
-    const updatedHits = [...oldHits, ...hits];
-    this.setState({
-      results: {
-        ...results,
-        [searchKey]: { hits: updatedHits, page }
-      }
-    });
+    if (this._isMounted) {
+      const { hits, page } = result;
+      const { searchKey, results } = this.state;
+      const oldHits =
+        results && results[searchKey] ? results[searchKey].hits : [];
+      const updatedHits = [...oldHits, ...hits];
+      this.setState({
+        results: {
+          ...results,
+          [searchKey]: { hits: updatedHits, page }
+        }
+      });
+    }
   }
 
   fetchSearchTopStories(query, page = 0) {
@@ -48,9 +51,14 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true;
     const { query } = this.state;
     this.setState({ searchKey: query });
     this.fetchSearchTopStories(query);
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   onDismiss = id => {
