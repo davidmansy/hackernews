@@ -1,6 +1,8 @@
 import React from 'react';
 import Button from '../Button';
 import PropTypes from 'prop-types';
+import { SORTS } from '../../constants';
+import Sort from '../Sort';
 
 const largeColumn = {
   width: '40%'
@@ -14,10 +16,36 @@ const smallColumn = {
   width: '10%'
 };
 
-const Table = ({ list, onDismiss }) => {
+const Table = ({ list, onDismiss, sortKey, onSort, isSortReversed }) => {
+  const sortedList = isSortReversed
+    ? SORTS[sortKey](list).reverse()
+    : SORTS[sortKey](list);
   return (
     <div className="table">
-      {list.map(item => (
+      <div className="table-header">
+        <span style={{ width: '40%' }}>
+          <Sort sortKey={'TITLE'} onSort={onSort} activeSortKey={sortKey}>
+            Title
+          </Sort>
+        </span>
+        <span style={{ width: '30%' }}>
+          <Sort sortKey={'AUTHOR'} onSort={onSort} activeSortKey={sortKey}>
+            Author
+          </Sort>
+        </span>
+        <span style={{ width: '10%' }}>
+          <Sort sortKey={'COMMENTS'} onSort={onSort} activeSortKey={sortKey}>
+            Comments
+          </Sort>
+        </span>
+        <span style={{ width: '10%' }}>
+          <Sort sortKey={'POINTS'} onSort={onSort} activeSortKey={sortKey}>
+            Points
+          </Sort>
+        </span>
+        <span style={{ width: '10%' }}>Archive</span>
+      </div>
+      {sortedList.map(item => (
         <div key={item.objectID} className="table-row">
           <span style={largeColumn}>
             <a href={item.url}>{item.title}</a>

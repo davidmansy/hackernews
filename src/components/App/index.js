@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Search from '../Search';
 import Table from '../Table';
-import Button from '../Button';
 import './index.css';
 import {
   DEFAULT_QUERY,
@@ -13,6 +12,7 @@ import {
   PARAM_HPP
 } from '../../constants';
 import fetch from 'isomorphic-fetch';
+import ButtonWithLoading from '../ButtonWithLoading';
 
 class App extends Component {
   constructor(props) {
@@ -21,9 +21,18 @@ class App extends Component {
       results: null,
       searchKey: '',
       query: DEFAULT_QUERY,
-      error: null
+      error: null,
+      isLoading: false,
+      sortKey: 'NONE',
+      isSortReversed: false
     };
   }
+
+  onSort = sortKey => {
+    const isSortReversed =
+      this.state.sortKey === sortKey && !this.state.isSortReversed;
+    this.setState({ sortKey, isSortReversed });
+  };
 
   setSearchTopStories(result) {
     if (this._isMounted) {
@@ -36,12 +45,14 @@ class App extends Component {
         results: {
           ...results,
           [searchKey]: { hits: updatedHits, page }
-        }
+        },
+        isLoading: false
       });
     }
   }
 
   fetchSearchTopStories(query, page = 0) {
+    this.setState({ isLoading: true });
     fetch(
       `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${query}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`
     )
@@ -93,7 +104,15 @@ class App extends Component {
   };
 
   render() {
-    const { query, results, searchKey, error } = this.state;
+    const {
+      query,
+      results,
+      searchKey,
+      error,
+      isLoading,
+      sortKey,
+      isSortReversed
+    } = this.state;
     const page =
       (results && results[searchKey] && results[searchKey].page) || 0;
     const list =
@@ -114,14 +133,21 @@ class App extends Component {
           <div className="interactions">Something went wrong!</div>
         ) : (
           <div>
-            <Table list={list} onDismiss={this.onDismiss} />
+            <Table
+              list={list}
+              onDismiss={this.onDismiss}
+              sortKey={sortKey}
+              onSort={this.onSort}
+              isSortReversed={isSortReversed}
+            />
             <div className="interactions">
-              <Button
+              <ButtonWithLoading
                 onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}
+                isLoading={isLoading}
               >
                 More
-              </Button>
-            </div>{' '}
+              </ButtonWithLoading>
+            </div>
           </div>
         )}
       </div>

@@ -25,7 +25,9 @@ describe('Table', () => {
         objectID: 'z'
       }
     ],
-    onDismiss: () => {}
+    onDismiss: () => {},
+    sortKey: 'TITLE',
+    isSortReversed: false
   };
 
   it('renders without crashing', () => {
